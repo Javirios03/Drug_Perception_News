@@ -1,0 +1,46 @@
+# This is a basic workflow that is manually triggered
+
+name: Daily RTVE Pipeline
+
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
+on:
+  schedule:
+    # Horario en UTC → 20:30 UTC = 22:30 CEST (España peninsular)
+    - cron: "30 20 * * *"
+  workflow_dispatch: {} # Permite lanzarlo manualmente desde GitHub
+  
+permissions:
+  contents: write
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+      with:
+        persists-credentials: true
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run RTVE pipeline
+      run: |
+        python ./src/automatize.py
+
+    # Commit changes
+    - name: Commit & push
+      uses: stefanzweifel/git-auto-commit-action@v5
+      with:
+        commit_message: "chore: append today's URL to video_urls.txt"
+        file_pattern: "video_urls.txt"
+        branch: ${{ github.ref_name }}
