@@ -7,7 +7,7 @@ name: Daily RTVE Pipeline
 on:
   schedule:
     # Horario en UTC → 20:30 UTC = 22:30 CEST (España peninsular)
-    - cron: "30 20 * * *"
+    - cron: "30 20 * * 1-5"
   workflow_dispatch: {} # Permite lanzarlo manualmente desde GitHub
   
 permissions:
